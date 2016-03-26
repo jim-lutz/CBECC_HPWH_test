@@ -37,17 +37,27 @@ DT_ER05[]
 names(DT_ER05) == names(DT_HPWH05)
 
 for (i in seq_along(names(DT_ER05))) {
-  print(all.equal(DT_ER05$i, DT_HPWH05$i))
-  }
+  print(colnames(DT_ER05)[i])
+  print(all.equal(DT_ER05[[i]],DT_HPWH05[[i]]))
+}
+# [1] "Mo"
 # [1] TRUE
+# [1] "Day"
 # [1] TRUE
+# [1] "Hr"
 # [1] TRUE
+# [1] "JDay"
 # [1] TRUE
+# [1] "DOWH"
 # [1] TRUE
+# [1] "Day"
 # [1] TRUE
+# [1] "tDbO"
 # [1] TRUE
+# [1] "Tinlet"
 # [1] TRUE
-# [1] TRUE
+# [1] "garT"
+# [1] "Mean relative difference: 0.02852274"
 
 # rename 2nd 'Day' in to Day2
 setnames(DT_ER05, 6,"Day2")

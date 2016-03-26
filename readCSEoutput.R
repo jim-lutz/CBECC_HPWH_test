@@ -71,18 +71,6 @@ DT_ER03[, list( Total   = summary(Total),
                 )]
 DT_ER03[, HoY:=seq_len(8760)] # add hour of year to avoid time change problems when mergeing
 
-
-DT_ER03[, list(Mon, Day, Hr, 
-               ER.FXMix.Total   = Total, 
-               ER.FXMix.Faucet  = Faucet,
-               ER.FXMix.Shower  = Shower,
-               ER.FXMix.Bath    = Bath,
-               ER.FXMix.CWashr  = CWashr,
-               ER.FXMix.DWashr  = DWashr
-               )]
-
-
-
 # Electric resistance case, hot water drawn at water heater?
 names(DT_ER04)
 str(DT_ER04)
@@ -95,16 +83,6 @@ DT_ER04[, list( Total   = summary(Total),
                 DWashr  = summary(DWashr)
                 )]
 DT_ER04[, HoY:=seq_len(8760)] # add hour of year to avoid time change problems when mergeing
-
-
-DT_ER04[, list(Mon, Day, Hr, 
-               ER.WH.Total   = Total, 
-               ER.WH.Faucet  = Faucet,
-               ER.WH.Shower  = Shower,
-               ER.WH.Bath    = Bath,
-               ER.WH.CWashr  = CWashr,
-               ER.WH.DWashr  = DWashr
-               )]
 
 # check if DT_ER05 (days, temps & people) is the same as DT_HWPH05
 for (i in seq_along(names(DT_ER05))) {
@@ -124,39 +102,47 @@ DT_ER05[, nPeople:=substr(Day2,1,1)]
 # get string DOWH as an ordered factor 
 DT_ER05[, sDOWH:= factor(substr(Day2,2,2), levels=c("U","M","T","W","R","F","S","H"), ordered = TRUE)]
 
+setnames(DT_ER05, 1, "Mon") # change Mo to Mon for consistency w/ other tables
+
 str(DT_ER05)
 DT_ER05[, HoY:=seq_len(8760)] # add hour of year to avoid time change problems when mergeing
 
-
-DT_ER05[, list(Mon, Day, Hr, 
-               JDay          = JDay,
-               DOWH          = DOWH,
-               sDOWH         = sDOWH,
-               nPeople       = nPeople,
-               tDbO          = tDbO,
-               Tinlet        = Tinlet,
-               ER.garT       = garT
-               )]
 
 # Merge all the electric resistance case data.
 DT_ER <- merge(DT_ER01[, list(HoY, Mon, Day, Hr, ER.ElecTot=Tot, ER.ElecDhwBU=DhwBU)], # Electric resistance case, electricity use
                DT_ER02[, list(HoY, Mon, Day, Hr, ER.NatGasTot=Tot, ER.NatGasDhwBU=DhwBU)], # Electric resistance case, natural gas use
                by = c("HoY", "Mon", "Day", "Hr") )
-# why 8762 now?
-DT_ER[, MonDay := paste0(Mon,"-",Day)]
-DT_ER[, list(nHr=length(Hr)), by = MonDay][order(nHr)]
-#      MonDay nHr
-#   1:    3-8  23
-#   2:    1-1  24
-#   3:    1-2  24
-#  ---           
-# 364:  12-31  24
-# 365:   11-1  27   <- 2 extra hours on November 1
-DT_ER01[Mon=="11" & Day=="1", list(Mon, Day, Hr)] # <- there's two 11-1 03:00's
-DT_ER02[Mon=="11" & Day=="1", list(Mon, Day, Hr)] # <- there's two 11-1 03:00's
-DT_ER[Mon=="11" & Day=="1", list(Mon, Day, Hr)] # <- there's 4! 11-1 03:00's
+DT_ER <- merge(DT_ER, 
+               DT_ER03[, list(HoY, Mon, Day, Hr,              # Electric resistance case, hot water end use
+                              ER.FXMix.Total   = Total, 
+                              ER.FXMix.Faucet  = Faucet,
+                              ER.FXMix.Shower  = Shower,
+                              ER.FXMix.Bath    = Bath,
+                              ER.FXMix.CWashr  = CWashr,
+                              ER.FXMix.DWashr  = DWashr)],
+               by = c("HoY", "Mon", "Day", "Hr") )
+DT_ER <- merge(DT_ER, 
+               DT_ER04[, list(HoY, Mon, Day, Hr,       # Electric resistance case, hot water drawn at water heater?
+                       ER.WH.Total   = Total, 
+                       ER.WH.Faucet  = Faucet,
+                       ER.WH.Shower  = Shower,
+                       ER.WH.Bath    = Bath,
+                       ER.WH.CWashr  = CWashr,
+                       ER.WH.DWashr  = DWashr)],
+               by = c("HoY", "Mon", "Day", "Hr") )
+DT_ER <- merge(DT_ER, 
+               DT_ER05[, list(HoY, Mon, Day, Hr,              # days, temps & people
+                               JDay          = JDay,
+                               DOWH          = DOWH,
+                               sDOWH         = sDOWH,
+                               nPeople       = nPeople,
+                               tDbO          = tDbO,
+                               Tinlet        = Tinlet,
+                               ER.garT       = garT)],
+               by = c("HoY", "Mon", "Day", "Hr") )
+str(DT_ER)
+str(DT_ER05)
 
-               
                
                
                
