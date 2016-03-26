@@ -3,6 +3,7 @@ fn_script = "readCSEoutput.R"
 # save as data.tables to DR.Rdata
 
 # Jim Lutz "Fri Mar 25 15:29:10 2016"
+# "Sat Mar 26 13:33:13 2016"    merge all the datasets into one big data.table
 
 # make sure all packages loaded and start logging
 source("setup.R")
@@ -45,5 +46,124 @@ tables()
 # [10,] DT_HPWH05 8,760    9  1 Mo,Day,Hr,JDay,DOWH,Day,tDbO,Tinlet,garT                                            
 # Total: 14MB
 
-# save the data.tables for later work
+# Electric resistance case, electricity use
+names(DT_ER01)
+str(DT_ER01)
+DT_ER01[, list(Dhw=sum(Dhw), DhwBu=sum(DhwBU), Subhr=unique(Subhr))]
+DT_ER01[, HoY:=seq_len(8760)] # add hour of year to avoid time change problems when mergeing
+
+# Electric resistance case, natural gas use
+names(DT_ER02)
+str(DT_ER02)
+DT_ER02[, list(Dhw=sum(Dhw), DhwBu=sum(DhwBU), Subhr=unique(Subhr))]
+DT_ER02[, HoY:=seq_len(8760)] # add hour of year to avoid time change problems when mergeing
+
+# Electric resistance case, hot water end use
+names(DT_ER03)
+str(DT_ER03)
+DT_ER03[, list( Total   = summary(Total),
+                Unknown = summary(Unknown),
+                Faucet  = summary(Faucet),
+                Shower  = summary(Shower),
+                Bath    = summary(Bath),
+                CWashr  = summary(CWashr),
+                DWashr  = summary(DWashr)
+                )]
+DT_ER03[, HoY:=seq_len(8760)] # add hour of year to avoid time change problems when mergeing
+
+
+DT_ER03[, list(Mon, Day, Hr, 
+               ER.FXMix.Total   = Total, 
+               ER.FXMix.Faucet  = Faucet,
+               ER.FXMix.Shower  = Shower,
+               ER.FXMix.Bath    = Bath,
+               ER.FXMix.CWashr  = CWashr,
+               ER.FXMix.DWashr  = DWashr
+               )]
+
+
+
+# Electric resistance case, hot water drawn at water heater?
+names(DT_ER04)
+str(DT_ER04)
+DT_ER04[, list( Total   = summary(Total),
+                Unknown = summary(Unknown),
+                Faucet  = summary(Faucet),
+                Shower  = summary(Shower),
+                Bath    = summary(Bath),
+                CWashr  = summary(CWashr),
+                DWashr  = summary(DWashr)
+                )]
+DT_ER04[, HoY:=seq_len(8760)] # add hour of year to avoid time change problems when mergeing
+
+
+DT_ER04[, list(Mon, Day, Hr, 
+               ER.WH.Total   = Total, 
+               ER.WH.Faucet  = Faucet,
+               ER.WH.Shower  = Shower,
+               ER.WH.Bath    = Bath,
+               ER.WH.CWashr  = CWashr,
+               ER.WH.DWashr  = DWashr
+               )]
+
+# check if DT_ER05 (days, temps & people) is the same as DT_HWPH05
+for (i in seq_along(names(DT_ER05))) {
+  print(colnames(DT_ER05)[i])
+  print(all.equal(DT_ER05[[i]],DT_HPWH05[[i]]))
+}
+# only garT not the same.
+names(DT_ER05)
+str(DT_ER05)
+
+# rename 2nd 'Day' to Day2
+setnames(DT_ER05, 6,"Day2")
+
+# get number of people
+DT_ER05[, nPeople:=substr(Day2,1,1)]
+
+# get string DOWH as an ordered factor 
+DT_ER05[, sDOWH:= factor(substr(Day2,2,2), levels=c("U","M","T","W","R","F","S","H"), ordered = TRUE)]
+
+str(DT_ER05)
+DT_ER05[, HoY:=seq_len(8760)] # add hour of year to avoid time change problems when mergeing
+
+
+DT_ER05[, list(Mon, Day, Hr, 
+               JDay          = JDay,
+               DOWH          = DOWH,
+               sDOWH         = sDOWH,
+               nPeople       = nPeople,
+               tDbO          = tDbO,
+               Tinlet        = Tinlet,
+               ER.garT       = garT
+               )]
+
+# Merge all the electric resistance case data.
+DT_ER <- merge(DT_ER01[, list(HoY, Mon, Day, Hr, ER.ElecTot=Tot, ER.ElecDhwBU=DhwBU)], # Electric resistance case, electricity use
+               DT_ER02[, list(HoY, Mon, Day, Hr, ER.NatGasTot=Tot, ER.NatGasDhwBU=DhwBU)], # Electric resistance case, natural gas use
+               by = c("HoY", "Mon", "Day", "Hr") )
+# why 8762 now?
+DT_ER[, MonDay := paste0(Mon,"-",Day)]
+DT_ER[, list(nHr=length(Hr)), by = MonDay][order(nHr)]
+#      MonDay nHr
+#   1:    3-8  23
+#   2:    1-1  24
+#   3:    1-2  24
+#  ---           
+# 364:  12-31  24
+# 365:   11-1  27   <- 2 extra hours on November 1
+DT_ER01[Mon=="11" & Day=="1", list(Mon, Day, Hr)] # <- there's two 11-1 03:00's
+DT_ER02[Mon=="11" & Day=="1", list(Mon, Day, Hr)] # <- there's two 11-1 03:00's
+DT_ER[Mon=="11" & Day=="1", list(Mon, Day, Hr)] # <- there's 4! 11-1 03:00's
+
+               
+               
+               
+               
+
+
+
+
+
+# save all the data.tables for later work
 save(list=tables()$NAME, file=paste0(wd_data,"DT.Rdata"))
