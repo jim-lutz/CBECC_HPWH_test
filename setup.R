@@ -1,9 +1,8 @@
-
 # setup.R
 # make sure any needed packages are loaded
 # Jim Lutz  Mon Jan  6 10:20:41 CST 2014
-# "Mon Jan  6 22:32:35 2014"
-# had to do these steps individually instead of sourcing this file
+# "Mon Jan  6 22:32:35 2014" 
+# "Sun Mar 27 13:24:01 2016"  
 
 # http://cran.cnr.berkeley.edu/bin/linux/ubuntu/
 # http://www.r-bloggers.com/r-3-0-0-is-released-whats-new-and-how-to-upgrade/
@@ -13,8 +12,7 @@
 # Warning in install.packages :
 #   package ‘installr’ is not available (for R version 3.0.2)
 # HA it's for Windows machines, not linux
-
-
+# had to do these steps individually instead of sourcing this file
 
 # had to change permissions for library
 # /usr/lib/R$ sudo -R chmod 777 library
@@ -23,6 +21,20 @@
 # /home/jiml/R/packages 
 # see: http://www.r-bloggers.com/installing-r-packages/
 
+# clean up leftovers before starting
+# clear all the objects except fn_script
+l_obj=ls(all=TRUE)
+l_obj = c(l_obj, "l_obj") # be sure to include l_obj
+rm(list = l_obj[l_obj != "fn_script"])
+# clear the plots
+if(!is.null(dev.list())){
+  dev.off(dev.list()["RStudioGD"])
+}
+# clear history
+cat("", file = "nohistory")
+loadhistory("nohistory")
+# clear the console
+cat("\014")
 
 
 # only works if have internet access

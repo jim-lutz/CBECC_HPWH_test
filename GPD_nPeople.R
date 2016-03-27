@@ -3,17 +3,6 @@ fn_script = "GPD_nPeople.R"
 
 # Jim Lutz "Sat Mar 26 19:14:21 2016"
 
-# clean up leftovers before starting
-# clear the console
-cat("\014")
-# clear all the variables
-rm(list=ls(all=TRUE))
-# clear the plots
-dev.off(dev.list()["RStudioGD"])
-# clear history
-cat("", file = "nohistory")
-loadhistory("nohistory")
-
 # make sure all packages loaded and start logging
 source("setup.R")
 
