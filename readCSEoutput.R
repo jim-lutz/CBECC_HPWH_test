@@ -6,6 +6,14 @@ fn_script = "readCSEoutput.R"
 # "Sat Mar 26 13:33:13 2016"    merge all the datasets into one big data.table
 # "Sat Mar 26 18:02:53 2016"    functionalize some of the reading into two data.tables
 
+# clean up before starting
+# clear the console
+cat("\014")
+# clear all the variables
+rm(list=ls(all=TRUE))
+
+
+
 # make sure all packages loaded and start logging
 source("setup.R")
 
