@@ -61,9 +61,9 @@ str(DT_HPWH05)
 
 
 # Now merge all the HPWH case data.
-DT_HPWH <- merge(DT_HPWH01[, list(HoY, Mon, Day, Hr, HPWH.ElecTot=Tot, HPWH.ElecDhw=Dhw, HPWH.ElecDhwBU=DhwBU)], # HPWH case, electricity use
-               DT_HPWH02[, list(HoY, Mon, Day, Hr, HPWH.NatGasTot=Tot, HPWH.NatGasDhwBU=DhwBU)], # HPWH case, natural gas use
-               by = c("HoY", "Mon", "Day", "Hr") )
+DT_HPWH <- merge(DT_HPWH01[, list(HoY, Mon, Day, Hr, HPWH.ElecTot=Tot,   HPWH.ElecDhw=Dhw,   HPWH.ElecDhwBU=DhwBU)], # HPWH case, electricity use
+                 DT_HPWH02[, list(HoY, Mon, Day, Hr, HPWH.NatGasTot=Tot, HPWH.NatGasDhw=Dhw, HPWH.NatGasDhwBU=DhwBU)], # HPWH case, natural gas use
+                 by = c("HoY", "Mon", "Day", "Hr") )
 DT_HPWH <- merge(DT_HPWH, 
                DT_HPWH03[, list(HoY, Mon, Day, Hr,              # HPWH case, hot water end use
                               HPWH.FXMix.Total   = Total, 

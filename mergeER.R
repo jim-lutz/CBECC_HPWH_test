@@ -68,8 +68,8 @@ str(DT_ER05)
 
 
 # Now merge all the electric resistance case data.
-DT_ER <- merge(DT_ER01[, list(HoY, Mon, Day, Hr, ER.ElecTot=Tot, ER.ElecDhwBU=DhwBU)], # Electric resistance case, electricity use
-               DT_ER02[, list(HoY, Mon, Day, Hr, ER.NatGasTot=Tot, ER.NatGasDhwBU=DhwBU)], # Electric resistance case, natural gas use
+DT_ER <- merge(DT_ER01[, list(HoY, Mon, Day, Hr, ER.ElecTot=Tot,   ER.ElecDhw=Dhw,   ER.ElecDhwBU=DhwBU)], # Electric resistance case, electricity use
+               DT_ER02[, list(HoY, Mon, Day, Hr, ER.NatGasTot=Tot, ER.NatGasDhw=Dhw, ER.NatGasDhwBU=DhwBU)], # Electric resistance case, natural gas use
                by = c("HoY", "Mon", "Day", "Hr") )
 DT_ER <- merge(DT_ER, 
                DT_ER03[, list(HoY, Mon, Day, Hr,              # Electric resistance case, hot water end use

@@ -9,7 +9,7 @@ source("setup.R")
 # set the working directory names 
 source("setup_wd.R")
 
-# load useful functions (probably don't need this.)
+# load useful functions 
 source("functions.R")
 
 # load the data.tables for checking

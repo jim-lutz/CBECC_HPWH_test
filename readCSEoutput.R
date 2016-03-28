@@ -5,14 +5,7 @@ fn_script = "readCSEoutput.R"
 # Jim Lutz "Fri Mar 25 15:29:10 2016"
 # "Sat Mar 26 13:33:13 2016"    merge all the datasets into one big data.table
 # "Sat Mar 26 18:02:53 2016"    functionalize some of the reading into two data.tables
-
-# clean up before starting
-# clear the console
-cat("\014")
-# clear all the variables
-rm(list=ls(all=TRUE))
-
-
+# "Sun Mar 27 21:36:52 2016"    make sure getting Dhw and DhwBu for ER and HPWH
 
 # make sure all packages loaded and start logging
 source("setup.R")
@@ -59,11 +52,17 @@ tables()
 source("mergeER.R") 
 names(DT_ER)
 str(DT_ER)
+#confirm reading correct Dhw 
+DT_ER[, list(ER.ElecDhw=sum(ER.ElecDhw), ER.ElecDhwBU=sum(ER.ElecDhwBU))]
 
 # Merge DT_HPWH0[1-5] to make one data.table for the HPWH case
 source("mergeHPWH.R") 
-names(DT_HPWH01)
+names(DT_HPWH)
 str(DT_HPWH)
+#confirm reading correct Dhw 
+DT_HPWH[, list(HPWH.ElecDhw=sum(HPWH.ElecDhw), HPWH.ElecDhwBU=sum(HPWH.ElecDhwBU))]
+
+
 
 # save all the data.tables for later work
 save(list=tables()$NAME, file=paste0(wd_data,"DT.Rdata"))
